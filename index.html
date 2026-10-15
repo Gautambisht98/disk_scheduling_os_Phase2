@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disk Scheduling Lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">DS</div>
+    <div class="brand-copy"><h1>Disk Scheduling Lab</h1><p>A simple way to run and compare disk algorithms</p></div>
+    <div class="queue-pill"><span class="status-dot"></span><span id="queueStatus">1,000 requests ready</span></div>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">OPERATING SYSTEMS · PROJECT</p><h2>See how the disk head moves.</h2><p class="intro-text">Run any of the 15 implemented algorithms alone or compare them on the exact same request queue.</p></div>
+      <div class="intro-icon" aria-hidden="true"><div class="disk-circle"><span></span></div><div class="disk-arm"></div></div>
+    </section>
+
+    <section class="panel setup-panel">
+      <div class="section-heading"><div><span class="step">01</span><h3>Request queue</h3></div><span class="small-note">Same queue for every run</span></div>
+      <div class="setup-grid">
+        <label>Number of requests <input id="requestCount" type="number" min="1" max="20000" value="1000"></label>
+        <label>Random seed <input id="seed" type="number" value="42"></label>
+        <label>Disk cylinders <input id="cylinders" type="number" min="2" max="100000" value="5000"></label>
+        <label>Initial head position <input id="head" type="number" min="0" value="2500"></label>
+        <label>Initial direction <select id="direction"><option value="1">Toward higher cylinders</option><option value="-1">Toward cylinder 0</option></select></label>
+        <label>Workload pattern <select id="workloadType"><option value="random">Random requests</option><option value="sequential">Sequential requests</option><option value="custom">My own queue</option></select></label>
+      </div>
+      <div id="customQueueWrap" class="custom-queue-wrap" hidden><label>Request queue (cylinder numbers separated by commas or spaces)<textarea id="customQueueInput" rows="3" placeholder="98, 183, 37, 122, 14, 124, 65, 67"></textarea></label></div>
+      <div class="queue-actions"><button class="button button-primary" id="generateBtn">Create request queue</button><button class="button button-secondary" id="showQueueBtn" aria-expanded="false">Show request queue ↓</button><span id="queueMessage" class="inline-message">Seed 42 makes the random queue repeatable.</span></div>
+      <div id="queuePreview" class="queue-preview" hidden></div>
+    </section>
+
+    <section class="mode-grid">
+      <article class="mode-card" id="singleCard">
+        <div class="mode-number">A</div><p class="eyebrow">INDIVIDUAL RUN</p><h3>Run one algorithm</h3><p>See the service order, total head movement, access time and average wait.</p>
+        <label>Choose algorithm<select id="singleAlgo"></select></label>
+        <button class="button button-primary full-button" id="runSingleBtn">Run this algorithm <span>→</span></button>
+      </article>
+      <article class="mode-card compare-card" id="compareCard">
+        <div class="mode-number">B</div><p class="eyebrow">SIDE-BY-SIDE RUN</p><h3>Compare algorithms</h3><p>Choose two or more algorithms. Each receives the exact same queue and starting head.</p>
+        <div class="algo-options" id="algoOptions" aria-label="Select algorithms to compare"></div>
+        <div class="compare-footer"><button class="text-button" id="selectAllBtn">Select all</button><button class="text-button" id="selectNoneBtn">Clear</button><button class="button button-primary" id="runCompareBtn">Compare selected →</button></div>
+      </article>
+    </section>
+
+    <section id="results" class="results-section" hidden>
+      <div class="results-title"><div><p class="eyebrow">YOUR RESULTS</p><h2 id="resultsHeading">Algorithm results</h2><p id="resultsSub" class="muted">Results for the current request queue.</p></div><button class="button button-secondary" id="resetBtn">Reset results</button></div>
+      <div class="metric-grid" id="metrics"></div>
+      <article class="panel chart-panel"><div class="section-heading chart-heading"><div><span class="step">02</span><h3>Cumulative head movement</h3></div><span class="small-note">Compare cumulative cylinders moved after each request</span></div><p class="chart-description">Each point shows the total cylinders travelled after serving that request. Compare the shape and final value of each line.</p><div class="chart-wrap"><canvas id="movementChart" aria-label="Cumulative head movement chart"></canvas></div><div id="legend" class="legend"></div></article>
+      <article class="panel table-panel"><div class="section-heading"><div><span class="step">03</span><h3>Simple comparison</h3></div><button class="text-button" id="downloadBtn">Download CSV ↓</button></div><div class="table-wrap"><table><thead><tr><th>Algorithm</th><th>Total head movement <span class="th-hint">(cylinders)</span></th><th>Average access time <span class="th-hint">(ms)</span></th><th>Average wait <span class="th-hint">(ms)</span></th><th>Requests served</th></tr></thead><tbody id="resultsRows"></tbody></table></div><p class="table-note">Best values are highlighted. Every selected algorithm uses the same request queue and starting head. Access time is the average time from queue arrival to request completion; the default model uses 1 ms per cylinder and no rotational latency.</p></article>
+      <article class="panel route-panel"><div class="section-heading"><div><span class="step">04</span><h3>Request service order</h3></div><label class="order-select">Show order for<select id="orderAlgo"></select></label></div><p class="chart-description">The cylinder numbers below show where the disk head goes, in order.</p><div id="requestOrder" class="request-order"></div></article>
+    </section>
+    <footer>Disk Scheduling Lab <span>·</span> Runs locally in your browser. No account or server required.</footer>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="js/algorithms.js"></script>
+  <script src="js/dataset.js"></script>
+  <script src="js/simple-app.js"></script>
+</body>
+</html>
